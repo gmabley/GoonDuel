@@ -6,6 +6,25 @@
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
         <title>Goons</title>
+        <style>
+            .css-serial {
+                counter-reset: serial-number;  /* Set the serial number counter to 0 */
+            }
+
+            .css-serial td:first-child:before {
+                counter-increment: serial-number;  /* Increment the serial number counter */
+                content: counter(serial-number);  /* Display the counter */
+            }
+
+            .css-serial2 {
+                counter-reset: serial-number;  /* Set the serial number counter to 0 */
+            }
+
+            .css-serial2 td:first-child:before {
+                counter-increment: serial-number;  /* Increment the serial number counter */
+                content: counter(serial-number);  /* Display the counter */
+            }
+        </style>
     </head>
 
     <body>
@@ -18,26 +37,48 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/">Rankings</a>
-                    <a class="navbar-brand" href="/duel">Duel</a>
+                    <a class="navbar-brand" style="font-size: 35pt" href="/">Rankings</a>
+                    <a class="navbar-brand" style="font-size: 35pt" href="/duel">Duel</a>
+                    <a class="navbar-brand" style="font-size: 35pt" href="/vibes">Vibes</a>
                 </div>
             </div>
         </nav>
 
-        <div class="container">
-        {% for goon in goons %}
-                <div class="row">
-                    {{ goon.name }}
-                    {{ goon.rank }}
-                </div>
-        {% endfor %}
+        <table style="margin: 0cm 2cm 0cm 2cm">
+        <tr>
+        <td style="min-width: 400px">
+        <h3>Skill</h3>
+        <table class="css-serial">
+        <thead><tr><th>Rank</th><th>Goon</th><th>Skill</th></tr></thead>
+        <tbody>
+        {% for goon in goons1 %}
+                <tr>
 
-        <div class="row">
-            <form action="." method="POST">
-                <input type='text' name="name" placeholder="Goon name" class="form-control">
-                <input type="submit" value="Create goon">
-            </form>
-        </div>
-        </div><!-- /.container -->
+                <td style="min-width: 50px"></td>
+                <td style="min-width: 150px">{{ goon.name }}</td>
+                <td>{{ goon.rank }}</td>
+                </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+        </td>
+        <td>
+        <h3>Vibes</h3>
+        <table class="css-serial2">
+        <thead><tr><th>Rank</th><th>Goon</th><th>Vibes</th></tr></thead>
+        <tbody>
+        {% for goon in goons2 %}
+                <tr>
+
+                <td style="min-width: 50px"></td>
+                <td style="min-width: 150px">{{ goon.name }}</td>
+                <td>{{ goon.vibes }}</td>
+                </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+        </td>
+        </tr>
+        </table>
     </body>
 </html>
