@@ -8,7 +8,7 @@ app.config["DEBUG"] = False
 
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
     username="sleppy",
-    password="george22",
+    password="notarealpass",
     hostname="sleppy.mysql.pythonanywhere-services.com",
     databasename="sleppy$goons",
 )
