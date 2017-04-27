@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-        <title>Goons</title>
+        <title>Vibes Duel</title>
     </head>
 
     <body>
@@ -31,6 +31,7 @@
                 <input type="submit" style="font-size: 15pt" name = "one" value="{{ goons[0].name }} has better vibes than {{ goons[1].name }}">
                 <input type="submit" style="font-size: 15pt" name = "two" value="{{ goons[1].name }} has better vibes than {{ goons[0].name }}">
                 <input type="submit" style="font-size: 15pt" name = "skip" value="Skip">
+                <input type='hidden' name="code" value="{{ key.code }}" visible="false">
             </form>
         </div>
         </div><!-- /.container -->

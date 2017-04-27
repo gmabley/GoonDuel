@@ -1,12 +1,10 @@
-
-# A very simple Flask Hello World app for you to get started with...
-
 from flask import Flask, redirect, render_template, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import func
+import string, random, datetime
 
 app = Flask(__name__)
-app.config["DEBUG"] = True
+app.config["DEBUG"] = False
 
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
     username="sleppy",
@@ -26,6 +24,12 @@ class Goon(db.Model):
     rank = db.Column(db.Float)
     vibes = db.Column(db.Float)
 
+class Code(db.Model):
+    __tablename__ = "codes"
+
+    code = db.Column(db.String(5), primary_key=True)
+    time = db.Column(db.DateTime)
+
 @app.route("/", methods=["GET"])
 def userlist():
     return render_template("userlist.html", goons1=Goon.query.order_by(Goon.rank.desc()).all(), goons2=Goon.query.order_by(Goon.vibes.desc()).all())
@@ -33,9 +37,26 @@ def userlist():
 @app.route("/duel", methods=["GET", "POST"])
 def duel():
     if request.method == "GET":
-        return render_template("duel.html", goons=Goon.query.order_by(func.rand()).limit(2).all())
+        timenow = datetime.datetime.utcnow()
+        key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        key = Code(code=key, time=timenow)
+        db.session.add(key)
+        db.session.commit()
+        return render_template("duel.html", goons=Goon.query.order_by(func.rand()).limit(2).all(), key=key)
 
+    timenow = datetime.datetime.utcnow()
+    thresh = timenow - datetime.timedelta(minutes=3)
+    old = db.session.query(Code).filter(Code.time < thresh).all()
+    for i in old:
+        db.session.delete(i)
+        db.session.commit()
+    key = request.form["code"]
+    secret = Code.query.filter_by(code=key).first()
+    if (secret is None):
+        return "Invalid key.  You are either a dirty cheater, or you waited too long to vote."
     if "skip" in request.form:
+        db.session.delete(secret)
+        db.session.commit()
         return redirect(url_for("duel"))
     elif "one" in request.form:
         name1 = request.form["one"].split(" is better than ")[0]
@@ -46,6 +67,7 @@ def duel():
         rank2 = goon2.rank
         goon1.rank = elo(rank1, rank2, 0)
         goon2.rank = elo(rank1, rank2, 1)
+        db.session.delete(secret)
         db.session.commit()
         return redirect(url_for("duel"))
     elif "two" in request.form:
@@ -57,6 +79,7 @@ def duel():
         rank2 = goon2.rank
         goon1.rank = elo(rank1, rank2, 0)
         goon2.rank = elo(rank1, rank2, 1)
+        db.session.delete(secret)
         db.session.commit()
         return redirect(url_for("duel"))
 
@@ -64,9 +87,26 @@ def duel():
 def vibes():
     goons=Goon.query.order_by(func.rand()).limit(2).all()
     if request.method == "GET":
-        return render_template("vibes.html", goons=goons)
+        timenow = datetime.datetime.utcnow()
+        key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        key = Code(code=key, time=timenow)
+        db.session.add(key)
+        db.session.commit()
+        return render_template("vibes.html", goons=goons, key=key)
 
+    timenow = datetime.datetime.utcnow()
+    thresh = timenow - datetime.timedelta(minutes=2)
+    old = db.session.query(Code).filter(Code.time < thresh).all()
+    for i in old:
+        db.session.delete(i)
+        db.session.commit()
+    key = request.form["code"]
+    secret = Code.query.filter_by(code=key).first()
+    if (secret is None):
+        return "fuck you, stop trying to cheat!"
     if "skip" in request.form:
+        db.session.delete(secret)
+        db.session.commit()
         return redirect(url_for("vibes"))
     elif "one" in request.form:
         name1 = request.form["one"].split(" has better vibes than ")[0]
@@ -77,6 +117,7 @@ def vibes():
         vibes2 = goon2.vibes
         goon1.vibes = elo(vibes1, vibes2, 0)
         goon2.vibes = elo(vibes1, vibes2, 1)
+        db.session.delete(secret)
         db.session.commit()
         return redirect(url_for("vibes"))
     elif "two" in request.form:
@@ -88,6 +129,7 @@ def vibes():
         vibes2 = goon2.vibes
         goon1.vibes = elo(vibes1, vibes2, 0)
         goon2.vibes = elo(vibes1, vibes2, 1)
+        db.session.delete(secret)
         db.session.commit()
         return redirect(url_for("vibes"))
 
